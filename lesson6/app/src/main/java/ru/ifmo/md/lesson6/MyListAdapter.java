@@ -25,6 +25,10 @@ public class MyListAdapter extends BaseAdapter {
         this.mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
+    public void addRssItem(RssItem item) {
+        items.add(item);
+    }
+
     @Override
     public int getCount() {
         return (items == null ? 0 : items.size());

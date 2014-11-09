@@ -6,11 +6,14 @@ import android.os.AsyncTask;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Created by sultan on 20.10.14.
@@ -50,6 +53,8 @@ public class RssDownloader extends AsyncTask<String, Void, ArrayList<RssItem> > 
         } catch (MalformedURLException e) {
         } catch (IOException e) {
         } catch (XmlPullParserException e) {
+        } catch (ParserConfigurationException e) {
+        } catch (SAXException e) {
         }
 
         return null;
