@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MyDbHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "mysuperdb.db";
-    private static final Integer VERSION = 1;
+    private static final Integer VERSION = 2;
 
     public static final String TABLE_FEED = "feed";
     public static final String COLUMN_FEED_ID = "_id";

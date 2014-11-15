@@ -67,13 +67,18 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Cursor cursor = simpleCursorAdapter.getCursor();
                 cursor.moveToPosition(i);
-                Uri delUri = ContentUris.withAppendedId(MyContentProvider.FEED_CONTENT_URI,
-                                    cursor.getLong(cursor.getColumnIndexOrThrow(MyDbHelper.COLUMN_FEED_ID)));
-                getContentResolver().delete(delUri, null, null);
+                deleteFeed(cursor.getLong(cursor.getColumnIndexOrThrow(MyDbHelper.COLUMN_FEED_ID)));
                 return true;
             }
         });
 
+
+    }
+
+    private void deleteFeed(long feedId) {
+        Uri delUri = ContentUris.withAppendedId(MyContentProvider.FEED_CONTENT_URI, feedId);
+        getContentResolver().delete(delUri, null, null);
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
 
     }
 
@@ -83,6 +88,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         contentValues.put(MyDbHelper.COLUMN_FEED_LINK, feedItem.getLink());
         contentValues.put(MyDbHelper.COLUMN_FEED_TITLE, feedItem.getTitle());
         Uri newUri = getContentResolver().insert(MyContentProvider.FEED_CONTENT_URI, contentValues);
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
         Log.d(LOG_TAG, "new Uri: " + newUri.toString());
 
     }

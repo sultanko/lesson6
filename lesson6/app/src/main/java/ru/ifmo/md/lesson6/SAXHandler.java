@@ -27,22 +27,17 @@ public class SAXHandler extends DefaultHandler {
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-//        super.characters(ch, start, length);
-//        Log.d("XML:", new String(ch, start, length));
         if (itemElement) {
             if (itemValue == null) {
                 itemValue = new String(ch, start, length);
             } else {
                 itemValue += (new String(ch, start, length));
             }
-//            Log.d("XML: ", itemValue);
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-//        super.endElement(uri, localName, qName);
-//        Log.d("XML:", "End tag:" + localName);
         if (!itemElement) {
             itemValue = null;
             return;
@@ -64,19 +59,16 @@ public class SAXHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-//        super.startElement(uri, localName, qName, attributes);
         if (localName.equalsIgnoreCase("item")) {
             item = new RssItem();
             itemElement = true;
             itemValue = null;
         }
-//        Log.d("XML:", "start tag:" + localName + itemElement);
     }
 
     @Override
     public void startDocument() throws SAXException {
         super.startDocument();
-//        Log.d("XML:", "Document start");
         result = new ArrayList<RssItem>();
         itemElement = false;
     }

@@ -29,16 +29,16 @@ public class MyIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         String feed = intent.getStringExtra(INPUT_TAG);
         Log.d("Intent: ", feed);
-        String errorReason = new String();
+        String errorReason = "";
         ArrayList<RssItem> result = null;
         try {
             result = RssParser.parseRss(feed);
         } catch (IOException e) {
-            errorReason = new String("Network error");
+            errorReason = "Network error";
         } catch (ParserConfigurationException e) {
-            errorReason = new String("Parse error");
+            errorReason = "Parse error";
         } catch (SAXException e) {
-            errorReason = new String("Parse error" + e.getMessage());
+            errorReason = "Parse error" + e.getMessage();
         }
 
         Intent response = new Intent();

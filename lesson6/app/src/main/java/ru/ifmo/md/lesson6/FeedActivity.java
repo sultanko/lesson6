@@ -44,7 +44,6 @@ public class FeedActivity extends Activity implements LoaderManager.LoaderCallba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
-//        myDbHelper = new MyDbHelper(this);
 
         intent = new Intent(this, WebActivity.class);
 

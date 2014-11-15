@@ -20,6 +20,7 @@ public class RssParser {
         URL uri = new URL(url);
 
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+//        saxParserFactory.setValidating(true);
         SAXParser parser = saxParserFactory.newSAXParser();
         SAXHandler saxHandler = new SAXHandler();
 
