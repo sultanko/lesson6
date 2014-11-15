@@ -3,6 +3,7 @@ package ru.ifmo.md.lesson6;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebView;
 
 /**
@@ -21,6 +22,9 @@ public class WebActivity extends Activity {
         webView = (WebView) findViewById(R.id.webView);
         intent = getIntent();
         String url_preview = intent.getStringExtra("URL_PREVIEW");
+
+        Log.d("WEB: ", url_preview);
+
         webView.loadUrl(url_preview);
     }
 }

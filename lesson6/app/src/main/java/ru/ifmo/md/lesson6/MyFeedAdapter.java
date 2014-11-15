@@ -1,7 +1,6 @@
 package ru.ifmo.md.lesson6;
 
 import android.content.Context;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,25 +10,31 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 /**
- * Created by sultan on 20.10.14.
+ * Created by sultan on 09.11.14.
  */
-public class MyListAdapter extends BaseAdapter {
+public class MyFeedAdapter extends BaseAdapter {
 
-    private final ArrayList<RssItem> items;
-    private final LayoutInflater mInflater;
+    private ArrayList<FeedItem> items;
+    private LayoutInflater mInflater;
 
-    public MyListAdapter(Context context, ArrayList<RssItem> items) {
+    public MyFeedAdapter(Context context, ArrayList<FeedItem> items) {
         this.items = items;
         this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void addRssItem(RssItem item) {
+    public void addFeedItem(FeedItem item) {
         items.add(item);
+        notifyDataSetChanged();
+    }
+
+    public void setItems(ArrayList<FeedItem> items) {
+        this.items = items;
+        notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return (items == null ? 0 : items.size());
+        return items.size();
     }
 
     @Override
@@ -49,13 +54,10 @@ public class MyListAdapter extends BaseAdapter {
             view = mInflater.inflate(R.layout.rss_row, viewGroup, false);
         }
 
-        RssItem item = (RssItem) getItem(i);
-        TextView title = (TextView) view.findViewById(R.id.rss_title);
-        TextView description = (TextView) view.findViewById(R.id.rss_description);
+        final FeedItem item = (FeedItem) getItem(i);
+        TextView title = (TextView) view.findViewById(R.id.feed_title);
 
         title.setText(item.getTitle());
-        description.setText(Html.fromHtml(item.getDescription()));
         return view;
     }
-
 }

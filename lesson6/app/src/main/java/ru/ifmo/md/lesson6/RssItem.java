@@ -2,20 +2,24 @@ package ru.ifmo.md.lesson6;
 
 import android.util.Log;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by sultan on 20.10.14.
  */
-public class RssItem {
+public class RssItem  implements Serializable {
 
+    private long id;
     private String link;
     private String title;
     private String description;
     private Date date;
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
+    private long feedId;
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
 
     public RssItem() {
     }
@@ -30,6 +34,32 @@ public class RssItem {
             this.date = new Date();
             Log.d("Error:", "Parse date string: " + date);
         }
+    }
+
+    public void setFeedId(long feedId) {
+        this.feedId = feedId;
+    }
+
+    public long getFeedId() {
+        return feedId;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Date getDate() {
+
+        return date;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+
+        return id;
     }
 
     public void setLink(String link) {

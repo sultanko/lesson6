@@ -16,6 +16,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="ru.ifmo.md.lesson6.FeedActivity"
+            android:label="@string/title_activity_feed" >
+        </activity>
+        <activity android:name=".WebActivity"
+            android:label="WebActivity">
+        </activity>
+        <service android:name=".MyIntentService" />
+        <provider
+            android:authorities="ru.ifmo.md.lesson6.contentprovider"
+            android:name=".MyContentProvider"
+            ></provider>
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
