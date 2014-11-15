@@ -14,6 +14,8 @@ public class WebActivity extends Activity {
     private WebView webView;
     private Intent intent;
 
+    public static final String INTENT_URL_FOR_VIEW = "URL_FOR_VIEW";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,7 +23,7 @@ public class WebActivity extends Activity {
 
         webView = (WebView) findViewById(R.id.webView);
         intent = getIntent();
-        String url_preview = intent.getStringExtra("URL_PREVIEW");
+        String url_preview = intent.getStringExtra(INTENT_URL_FOR_VIEW);
 
         Log.d("WEB: ", url_preview);
 

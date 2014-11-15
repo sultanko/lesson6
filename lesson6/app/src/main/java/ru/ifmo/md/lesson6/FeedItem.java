@@ -9,7 +9,6 @@ public class FeedItem {
     private String title;
     private String link;
 
-    FeedItem() {}
     FeedItem(String link) {
         this.title = link;
         this.link = link;

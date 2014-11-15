@@ -18,25 +18,8 @@ public class MyContentProvider extends ContentProvider {
 
     private String LOG_TAG = "CONTENT_PROVIDER: ";
 
-    public static final String TABLE_FEED = "feed";
-    public static final String COLUMN_FEED_ID = "_id";
-    public static final String COLUMN_FEED_TITLE = "title";
-    public static final String COLUMN_FEED_LINK = "link";
-    private static final String[] COLUMNS_FEED = {COLUMN_FEED_ID,
-            COLUMN_FEED_TITLE, COLUMN_FEED_LINK};
-
-    public static final String TABLE_RSS = "rss";
-    public static final String COLUMN_RSS_ID = "_id";
-    private static final String COLUMN_RSS_TITLE = "title";
-    private static final String COLUMN_RSS_LINK = "link";
-    private static final String COLUMN_RSS_DESCRIPTION = "description";
-    private static final String COLUMN_RSS_DATE = "pub_date";
-    private static final String COLUMN_RSS_FEED_ID = "feed_id";
-    private static final String[] COLUMNS_RSS = {
-            COLUMN_RSS_ID, COLUMN_RSS_TITLE,
-            COLUMN_RSS_LINK, COLUMN_RSS_DESCRIPTION,
-            COLUMN_RSS_DATE, COLUMN_RSS_FEED_ID
-    };
+    public static final String TABLE_FEED = MyDbHelper.TABLE_FEED;
+    public static final String TABLE_RSS = MyDbHelper.TABLE_RSS;
 
     private static final String AUTHORITY = "ru.ifmo.md.lesson6.contentprovider";
 
@@ -74,6 +57,52 @@ public class MyContentProvider extends ContentProvider {
         mURIMatcher.addURI(AUTHORITY, RSS_PATH + "/#", URI_RSS_ID);
     }
 
+    private class QueryData {
+        private String tableName;
+        private String selection;
+
+
+        public QueryData(Uri uri, String querySelection) {
+            int uriType = mURIMatcher.match(uri);
+            selection = querySelection;
+            switch (uriType) {
+                case URI_FEEDS:
+                    tableName = TABLE_FEED;
+                    break;
+                case URI_FEEDS_ID:
+                    tableName = TABLE_FEED;
+                    String feed_id = uri.getLastPathSegment();
+                    if (TextUtils.isEmpty(querySelection)) {
+                        selection = MyDbHelper.COLUMN_FEED_ID + " = " + feed_id;
+                    } else {
+                        selection = querySelection + " AND " + MyDbHelper.COLUMN_FEED_ID + " = " + feed_id;
+                    }
+                    break;
+                case URI_RSS:
+                    tableName = TABLE_RSS;
+                    break;
+                case URI_RSS_ID:
+                    tableName = TABLE_RSS;
+                    String rss_id = uri.getLastPathSegment();
+                    if (TextUtils.isEmpty(querySelection)) {
+                        selection = MyDbHelper.COLUMN_FEED_ID + " = " + rss_id;
+                    } else {
+                        selection = querySelection + " AND " + MyDbHelper.COLUMN_FEED_ID + " = " + rss_id;
+                    }
+                    break;
+            }
+
+        }
+        public String getSelection() {
+            return selection;
+        }
+
+        public String getTableName() {
+            return tableName;
+
+        }
+    }
+
     private MyDbHelper dbHelper;
     private SQLiteDatabase db;
 
@@ -85,45 +114,20 @@ public class MyContentProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] columns, String selection, String[] selectionArgs, String sortOrder) {
-        Log.d(LOG_TAG, "start query: " + uri.toString());
+        Log.d(LOG_TAG, "start query: " + uri.toString() + " " + selection + " " + selectionArgs);
 
         int uriType = mURIMatcher.match(uri);
-        String table_name = "";
-        switch (uriType) {
-            case URI_FEEDS:
-                table_name = TABLE_FEED;
-                break;
-            case URI_FEEDS_ID:
-                table_name = TABLE_FEED;
-                String feed_id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
-                    selection = COLUMN_FEED_ID + " = " + feed_id;
-                } else {
-                    selection = selection + " AND " + COLUMN_FEED_ID + " = " + feed_id;
-                }
-                break;
-            case URI_RSS:
-                table_name = TABLE_RSS;
-                break;
-            case URI_RSS_ID:
-                table_name = TABLE_RSS;
-                String rss_id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
-                    selection = COLUMN_FEED_ID + " = " + rss_id;
-                } else {
-                    selection = selection + " AND " + COLUMN_FEED_ID + " = " + rss_id;
-                }
-                break;
-        }
+        QueryData data = new QueryData(uri, selection);
+        Log.d(LOG_TAG, "query table: " + data.getTableName() + data.getSelection());
         db = dbHelper.getWritableDatabase();
-        Cursor cursor = db.query(table_name, columns, selection, selectionArgs, null, null, sortOrder);
+        Cursor cursor = db.query(data.getTableName(), columns, data.getSelection(), selectionArgs, null, null, sortOrder);
         if (uriType == URI_FEEDS || uriType == URI_FEEDS_ID) {
             cursor.setNotificationUri(getContext().getContentResolver(), FEED_CONTENT_URI);
         } else {
             cursor.setNotificationUri(getContext().getContentResolver(), RSS_CONTENT_URI);
         }
 
-        Log.d(LOG_TAG, "end query: " + uri.toString());
+        Log.d(LOG_TAG, "end query: " + uri.toString() + " " + selection + " " + selectionArgs);
         return cursor;
     }
 
@@ -149,16 +153,12 @@ public class MyContentProvider extends ContentProvider {
         Log.d(LOG_TAG, "start insert: " + uri.toString());
         int uriType = mURIMatcher.match(uri);
         if (uriType != URI_FEEDS && uriType != URI_RSS) {
-//            throw new IllegalArgumentException("Wrong URI: " + uri);
+            throw new IllegalArgumentException("Wrong URI: " + uri);
         }
 
         db = dbHelper.getWritableDatabase();
-        long rowId;
-        if (uriType == URI_FEEDS) {
-            rowId = db.insert(TABLE_FEED, null, contentValues);
-        } else {
-            rowId = db.insert(TABLE_RSS, null, contentValues);
-        }
+        QueryData data = new QueryData(uri, null);
+        long rowId = db.insert(data.getTableName(), null, contentValues);
 
         Uri resultUri;
         if (uriType == URI_FEEDS) {
@@ -174,37 +174,10 @@ public class MyContentProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         Log.d(LOG_TAG, "start delete: " + uri.toString());
-        int uriType = mURIMatcher.match(uri);
-        String table_name = "";
-        switch (uriType) {
-            case URI_FEEDS:
-                table_name = TABLE_FEED;
-                break;
-            case URI_FEEDS_ID:
-                table_name = TABLE_FEED;
-                String feed_id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
-                    selection = COLUMN_FEED_ID + " = " + feed_id;
-                } else {
-                    selection = selection + " AND " + COLUMN_FEED_ID + " = " + feed_id;
-                }
-                break;
-            case URI_RSS:
-                table_name = TABLE_RSS;
-                break;
-            case URI_RSS_ID:
-                table_name = TABLE_RSS;
-                String rss_id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
-                    selection = COLUMN_FEED_ID + " = " + rss_id;
-                } else {
-                    selection = selection + " AND " + COLUMN_FEED_ID + " = " + rss_id;
-                }
-                break;
-        }
+        QueryData data = new QueryData(uri, selection);
 
         db = dbHelper.getWritableDatabase();
-        int cnt = db.delete(table_name, selection, selectionArgs);
+        int cnt = db.delete(data.getTableName(), data.getSelection(), selectionArgs);
         getContext().getContentResolver().notifyChange(uri, null);
         Log.d(LOG_TAG, "end delete: " + uri.toString());
         return cnt;
@@ -213,37 +186,10 @@ public class MyContentProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
         Log.d(LOG_TAG, "start update: " + uri.toString());
-        int uriType = mURIMatcher.match(uri);
-        String table_name = "";
-        switch (uriType) {
-            case URI_FEEDS:
-                table_name = TABLE_FEED;
-                break;
-            case URI_FEEDS_ID:
-                table_name = TABLE_FEED;
-                String feed_id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
-                    selection = COLUMN_FEED_ID + " = " + feed_id;
-                } else {
-                    selection = selection + " AND " + COLUMN_FEED_ID + " = " + feed_id;
-                }
-                break;
-            case URI_RSS:
-                table_name = TABLE_RSS;
-                break;
-            case URI_RSS_ID:
-                table_name = TABLE_RSS;
-                String rss_id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
-                    selection = COLUMN_FEED_ID + " = " + rss_id;
-                } else {
-                    selection = selection + " AND " + COLUMN_FEED_ID + " = " + rss_id;
-                }
-                break;
-        }
+        QueryData data = new QueryData(uri, selection);
 
         db = dbHelper.getWritableDatabase();
-        int cnt = db.update(table_name, contentValues, selection, selectionArgs);
+        int cnt = db.update(data.getTableName(), contentValues, data.getSelection(), selectionArgs);
         getContext().getContentResolver().notifyChange(uri, null);
         Log.d(LOG_TAG, "end update: " + uri.toString());
         return cnt;
