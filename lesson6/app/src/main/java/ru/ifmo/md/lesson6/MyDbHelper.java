@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MyDbHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "mysuperdb.db";
-    private static final Integer VERSION = 2;
+    private static final Integer VERSION = 3;
 
     public static final String TABLE_FEED = "feed";
     public static final String COLUMN_FEED_ID = "_id";
@@ -30,7 +30,8 @@ public class MyDbHelper extends SQLiteOpenHelper {
 
     private static final FeedItem[] defaultFeeds = {
             new FeedItem("BBC", "http://feeds.bbci.co.uk/news/rss.xml"),
-            new FeedItem("Эхо Москвы", "http://echo.msk.ru/interview/rss-fulltext.xml")};
+            new FeedItem("Эхо Москвы", "http://echo.msk.ru/interview/rss-fulltext.xml"),
+            new FeedItem("Bash", "http://bash.im/rss")};
 
     public static final String TABLE_RSS = "rss";
     public static final String COLUMN_RSS_ID = "_id";
